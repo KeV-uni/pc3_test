@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Actividad12-CC3S2" />
         <module name="Actividad13-CC3S2" />
+        <module name="pc3_test" />
       </profile>
     </annotationProcessing>
   </component>

@@ -9,7 +9,7 @@ Los integrantes que participaron en el desarrollo de esta practica son:
 | Aguilar Ybarra Mario   |
 |  Rosales Joaquin Julio |
 
-
+*****
 ### Principio de Responsabilidad Unica (SRP)
 Pregunta 1 \
 Muestra la salida y explica los resultados en función de los métodos entregados.
