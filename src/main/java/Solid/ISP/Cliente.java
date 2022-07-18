@@ -1,8 +1,9 @@
 package Solid.ISP;
 
+/*
 public class Cliente {
     public static void main(String[] args) {
-        System.out.println("Demostracion con ISP");
+        System.out.println("Demostracion ISP");
 
         Impresora impresora = new ImpresoraBasica();
         impresora.printDocument();
@@ -11,5 +12,7 @@ public class Cliente {
 
         DispositivoFax fax = new ImpresoraAvanzada();
         fax.sendFax();
+
     }
 }
+*/

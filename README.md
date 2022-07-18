@@ -554,16 +554,192 @@ Usando este enfoque, evita el uso de las cadenas if-else (que se muestra en el p
 Pregunta 12 \
 Muestra la salida y explica los resultados en función de los métodos entregados.
 
+Para la primera parte en la clase Cliente se instancia el objeto
+
 ```java
+public class Cliente {
+public static void main(String[] args) {
+System.out.println("Demostracion sin LSP\n");
+PaymentHelper helper = new PaymentHelper();
+
+        // Instanciando dos usuarios registrados
+        GuestUserPayment pagoAbejita = new GuestUserPayment("Abejita");
+        RegisteredUserPayment pagoChalito = new RegisteredUserPayment("Chalito");
+
+        // Agregando los usuarios a los helper
+        helper.addUser(pagoAbejita);
+        helper.addUser(pagoChalito);
+
+        GuestUserPayment guestUser = new GuestUserPayment("Abejita");
+        helper.addUser(guestUser);
+
+        // Procesando el pago usando la clase helper
+        // Encuentras algun problema?
+        helper.showPreviousPayments();
+        helper.processNewPayments();
+
+    }
+}
 
 ```
+
+De la clase GuestUserPayment haciendo uso del constructor
 ```java
+public class GuestUserPayment implements Payment {
+    String name;
+    public GuestUserPayment(String abejita) {
+        this.name = "guest";
+    }
 
+    public GuestUserPayment() {
+
+    }
+
+    @Override
+    public void previousPaymentInfo(){
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public void newPayment(){
+        System.out.println("Processing "+name+"'s current payment request.");
+
+    }
+}
 ```
+
+Luego se llama al método showPreviousPayments()
 ```java
+public void showPreviousPayments() {
+    for (PreviousPayment payment: previousPayments) {
+        payment.previousPaymentInfo();
+        System.out.println("------");
+    }
+}
+```
+que ejecutará el método publico ShowPreviousPayments con un objeto de la clase Cliente.
+        
+Pregunta 13 \
+Ahora supongamos que tienes un nuevo requisito que dice que necesitas admitir usuarios invitados en el futuro. Puedes procesar la solicitud de pago de un usuario invitado, pero no muestra su último detalle de pago. Entonces, crea la siguiente clase que implementa la interfaz de pago de la siguiente manera:
+```java
+class GuestUserPayment implements Payment {
+    String name;
+    public GuestUserPayment() {
+        this.name = "guest";
+    }
+    @Override
+    public void previousPaymentInfo(){
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public void newPayment(){
+        System.out.println("Procesando de "+name+ "pago actual
+                request.");
+    }
+}
+```
+Suponemos que se necesita admitir usuarios invitados. Se entenderá que puede procesar la solicitud de pago de un usuario invitado pero veremos que no se mostrará a detalle su último pago. Luego implementaremos la clase IUser dentro de la Main() luego se crea una instancia de usuario invitado y se usará la clase auxiliar.
 
+Pregunta 14 \
+Dentro del método main(), utilizas una instancia de usuario invitado e intentas usar su clase auxiliar de la misma manera, ¿ qué tipo de excepción te encuentras?¿Cuál es la solución?
+
+En las iteraciones al llamar al metodo LoadPreviusPaymentInfo() en el objeto IUser se genera la excepcion para la instancia GuestUser. Este tipo de solución que le dimos no funcionará ya que GuestUser viola la regla LPS.
+La solución para este caso sería emplear cadenas if-else para verificar las instancias.
+
+```java
+public class GuestUserPayment implements Payment {
+String name;
+public GuestUserPayment(String abejita) {
+this.name = "guest";
+}
+public GuestUserPayment() {
+
+    }
+
+    @Override
+    public void previousPaymentInfo(){
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public void newPayment(){
+        System.out.println("Processing "+name+"'s current payment request.");
+    }
+}
 ```
 
+Pregunta 15 \
+Todo lo anterior Lo más importante es que viola el OCP cada vez que modifica una clase existente que usa esta cadena if-else. Entonces, busquemos una mejor solución.
+Una solucion seria eliminando el metodo ProcessNewPayment() de la interfaz IUser en donde colocaremos en otra interfaz, este metodo INewPayment como resultado obtendremos dos interfaces.
+
+```java
+public void addPreviousPayment(RegisteredUserPayment previousPayment){
+        boolean b;
+        if (previousPayments.add((PreviousPayment) previousPayment)) b = true;
+        else b = false;
+        boolean add = true;
+}
+```
+        
+Pregunta 16 \
+En el próximo programa, eliminaremos el método newPayment() de la interfaz de payment. Coloca este método en otra interfaz llamada NewPayment. Como resultado, ahora tienes dos interfaces con las operaciones específicas. Dado que todos los tipos de usuarios pueden generar una nueva solicitud de pago, las clases concretas de RegisteredUserPayment y GuestUserPayment implementan la interfaz NewPayment.
+Pero muestra el último detalle de pago solo para los usuarios registrados. Entonces, la clase RegisteredUser implementa la interfaz payment. Dado que Payment contiene el método previousPaymentInfo(), tiene sentido elegir un nombre mejor, como PreviousPayment en lugar de Payment. Entonces, ahora verá las siguientes interfaces:
+```java
+interface PreviousPayment {
+    void previousPaymentInfo();
+}
+interface NewPayment {
+    void newPayment();
+}
+```
+Ajuste estos nuevos nombres en la clase auxiliar también. En sección del código debes tener los siguientes archivos
+        PreviousPayment.java \
+        NewPayment.java \
+        RegisteredUserPayment.java \
+        GuestUserPayment.java \
+        PaymentHelper.java \
+        Cliente.java 
+
+Pregunta 17 \
+¿Cuáles son los cambios clave?
+
+Vimos que los metodos ShowPreviousPayments() y ProcessNewPayments() acepto instancias de la clase IUser como argumentos. Ahora el metodo ShowPreviousPayments() acepta las instancias de IPreviousPayment y ProcessNewPayments() aceptara las instancias de INewPayment como argumentos notamos que esta nueva estructura soluciona los problemas causados al crear usuarios y mostrar sus solicitudes de pagos actuales junto con los pagos anteriores.
+
+Pregunta 18 \
+Ten que aquí el enfoque clave estaba en el principio LSP, nada más. Podrías refactorizar fácilmente el código del cliente usando algún método estático. Por ejemplo realiza una modificación donde utilizas un método estático para mostrar todas las solicitudes de pago y utilizar este método siempre que lo necesites.
+```java
+public class PaymentHelper {
+    List<PreviousPayment> previousPayments = new ArrayList<PreviousPayment>();
+    List<NewPayment> newPayments = new ArrayList<NewPayment>();
+    public void addPreviousPayment(RegisteredUserPayment previousPayment){
+        boolean b;
+        if (previousPayments.add((PreviousPayment) previousPayment)) b = true;
+        else b = false;
+        boolean add = true;
+    }
+    public void addNewPayment(NewPayment newPaymentRequest){
+        newPayments.add(newPaymentRequest);
+    }
+    public void showPreviousPayments() {
+        for (PreviousPayment payment: previousPayments) {
+            payment.previousPaymentInfo();
+            System.out.println("------");
+        }
+    }
+    public void processNewPayments() {
+        for (NewPayment payment: newPayments) {
+            payment.newPayment();
+            System.out.println("***********");
+        }
+    }
+
+    public void addUser(RegisteredUserPayment pagoAbejita) {
+    }
+
+    public void addUser(GuestUserPayment pagoAbejita) {
+
+    }
+}
+```
+Aqui refactorizamos el codigo donde su utilizara metodos estaticos para mostrar las solicitudes de pago.
 *****
 ### Principio de Segregacion de Interfaz (ISP)
 Pregunta 19 \
@@ -880,18 +1056,7 @@ Pregunta 30\
 ¿Qué sucede si usa un método vacío, en lugar de lanzar la excepción?
 
 Se puede considerar que el uso de métodos vacíos no sigue el principio de ISP  ,ya que estarían violando el principio de :   "las clases que implementen una interfaz o una clase abstracta no deberían estar obligadas a utilizar partes que no van a utilizar".   porque ese método vacío no tendría funcionalidad ya que cuando se lanza una excepción esto ayudaría a mejorar el código smell ,ya que esta excepción nos indicaría que algo estaría funcionando mal .
-```java
-
-```
-```java
-
-```
-```java
-
-```
-
-
-
+*****
 ### Principio de Inversión de Dependencia (DIP)
 Pregunta 31 \
 Muestra la salida y explica los resultados en función de los métodos entregados

@@ -4,21 +4,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentHelper {
-    List<Payment> payments = new ArrayList<Payment>();
-
-    public void addUser(Payment user){
-        payments.add(user);
+    List<PreviousPayment> previousPayments = new ArrayList<PreviousPayment>();
+    List<NewPayment> newPayments = new ArrayList<NewPayment>();
+    public void addPreviousPayment(RegisteredUserPayment previousPayment){
+        boolean b;
+        if (previousPayments.add((PreviousPayment) previousPayment)) b = true;
+        else b = false;
+        boolean add = true;
+    }
+    public void addNewPayment(NewPayment newPaymentRequest){
+        newPayments.add(newPaymentRequest);
     }
     public void showPreviousPayments() {
-        for (Payment payment: payments) {
+        for (PreviousPayment payment: previousPayments) {
             payment.previousPaymentInfo();
             System.out.println("------");
         }
     }
-    public void processNewPayments()  {
-        for (Payment payment: payments) {
+    public void processNewPayments() {
+        for (NewPayment payment: newPayments) {
             payment.newPayment();
-            System.out.println("------");
+            System.out.println("***********");
         }
+    }
+
+    public void addUser(RegisteredUserPayment pagoAbejita) {
+    }
+
+    public void addUser(GuestUserPayment pagoAbejita) {
+
     }
 }

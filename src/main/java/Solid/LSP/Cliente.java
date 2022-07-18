@@ -1,5 +1,12 @@
 package Solid.LSP;
-/*
+
+import NoSolid.LSP.GuestUserPayment;
+import NoSolid.LSP.NewPayment;
+import NoSolid.LSP.PaymentHelper;
+import NoSolid.LSP.RegisteredUserPayment;
+
+import java.util.Arrays;
+
 public class Cliente {
     public static void main(String[] args) {
 
@@ -13,13 +20,13 @@ public class Cliente {
         GuestUserPayment guestUser1 = new GuestUserPayment();
 
         // Consolidando la informacion del pago anterior al helper
-        helper.addPreviousPayment(irene);
-        helper.addPreviousPayment(claudio);
+        for (RegisteredUserPayment registeredUserPayment : Arrays.asList(irene, claudio))
+            helper.addPreviousPayment(registeredUserPayment);
 
         // Consolidando nuevas solicitudes de pago al helper
-        helper.addNewPayment(irene);
-        helper.addNewPayment(claudio);
-        helper.addNewPayment(guestUser1);
+        helper.addNewPayment((NewPayment) irene);
+        helper.addNewPayment((NewPayment) claudio);
+        helper.addNewPayment((NewPayment) guestUser1);
 
         // Recupera todos los pagos anteriores de los usuarios registrados
         helper.showPreviousPayments();
@@ -30,4 +37,3 @@ public class Cliente {
 
     }
 }
-*/
