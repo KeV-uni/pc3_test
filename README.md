@@ -1071,21 +1071,3 @@ El beneficio sería que ahora puede crear instancias de una base de datos mientr
 BaseDatos.database = new OracleDatabase();
 usuario.saveEmployeeId("E003");
 ```
-
-`hola me llamo`
-`$ npm install ma
-ed`
-```
-ASDFASDMASMASDMASD
-```
-
-
-
-
-```
-```
-```
-```
-```
-```
-```
