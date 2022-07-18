@@ -895,23 +895,181 @@ Se puede considerar que el uso de métodos vacíos no sigue el principio de ISP 
 ### Principio de Inversión de Dependencia (DIP)
 Pregunta 31 \
 Muestra la salida y explica los resultados en función de los métodos entregados
+```
+A demo without IDP
+El id: E001 es guardado en la base de datos Oracle.
+```
+En la clase InterfaceUsuario se declara el atributo oracleDatabase como privado,también se genera un método InterfazUsuario() que genera un objeto oracleDatabase del tipo de clase OracleDatabase, inmediatamente lo está integrando como el atributo de la clase interfazUsuario. Asi tambien el metodo saveEmployeeId() recibe como argumento empId y este ID se guarda en la base de datos OracleDatabase, haciendo uso del metodo saveEmpIdInDatabase().
 ```java
+public class InterfazUsuario {
+    private OracleDatabase oracleDatabase;
+    public InterfazUsuario() {
+        this.oracleDatabase = new OracleDatabase();
+    }
+    public void saveEmployeeId(String empId) {
+        oracleDatabase.saveEmpIdInDatabase(empId);
+    }
+}
+```
+En esta clase OracleDataBase contiene al método saveEmpIdInDatabase() que recibe como argumento empId en el cual imprime un mensaje donde indica que el ID del empleado ingresado es guardado en la base de datos Oracle
 
+```java
+public class OracleDatabase {
+    public void saveEmpIdInDatabase(String empId) {
+        System.out.println("El id: " + empId + " es guardado en la base de datos Oracle.");
+    }
+}
+```
+Por último en la clase Cliente contiene un main el cual imprime un mensaje que nos dice que no se está usando DIP .Así también se crea un objeto llamado usuario del tipo de la clase InterfazUsuario y el objeto usuario usando el método saveEmployeeId() guarda el ID en el objeto usuario.
+
+Pregunta 32 \
+El programa es simple, pero ¿qué tipo de problemas presenta?
+
+El problema que se encuentra de las clases presentadas es lo siguiente:
+Haciendo un análisis de la clase InterfazUsuario, podemos resaltar que se observa un alto grado de modularidad debido a la gran dependencia existente de la clase InterfazUsuario al depender de la clase de nivel inferior OracleDatabase que se encuentra en zona de argumento, cuando se ingresa el atributo OracleDatabase de la clase InterfazUsuario siendo esta de nivel superior. Esta estrecha relación entre estas clases indica un gran acoplamiento entre ellas, lo que quiere decir que si en un futuro se desea hacer cambios en la clase OracleDatabase también se observarán  cambios en la clase InterfazUsuario
+
+Pregunta 33 \
+En el programa de la carpeta SOLID, para el caso DIP verás la siguiente jerarquía:
+BaseDatos.java \
+OracleDatabase.java
+
+ya que la interface BaseDatos tienes menos funcionalidad que la clase OracleDatabase
+
+```java
+interface BaseDatos {
+  void SaveEmpIdInDatabase(String empId);
+}
 ```
 ```java
+class OracleDatabase implements BaseDatos {
+    public void SaveEmpIdInDatabase(String empId)
+ {
+     System.out.println("El id: " + empId + " es guardado en la base de datos Oracle.");
 
+ }
+}
 ```
+En la clase OracleDatabase  esta implementando de la interfaz BaseDatos que es abstracta que contiene al metodo SaveEmpIdInDatabase que guarda el Id del empleado en la base de datos y lo muestra.
 ```java
+class OracleDatabase implements BaseDatos {
+    public void SaveEmpIdInDatabase(String empId)
+ {
+     System.out.println("El id: " + empId + " es guardado en la base de datos Oracle.");
 
+ }
+}
 ```
-```java
+En esta clase InterfazUsuario genera un atributo database de tipo BaseDatos y contiene al constructor InterfazUsuario y asu vez tambien contiene al metodo saveEmployeeID que guarda el ID del empleado en database.
 
+```java
+class InterfazUsuario {
+  private BaseDatos database;
+  public InterfazUsuario(BaseDatos database)
+  {
+      this.database=database;
+  }
+    public void saveEmployeeId(String empId) {
+        database.SaveEmpIdInDatabase(empId);
+    }
+}
 ```
-```java
+Esta clase MySQLDatabase implementa de la interfaz BaseDatos abstracta que contiene al metodo SaveEmpIdInDatabase en lo cual imprime el ID del y lo guarda en la base datos MySQL
 
+```java
+class MySQLDatabase implements BaseDatos {
+    public void SaveEmpIdInDatabase(String empId)
+    {
+        System.out.println("El id: " + empId + " es guardado en MySQL de la base de datos.");
+    }
+}
 ```
-```java
+Pregunta 34 \
+Completa todos los archivos siguientes de la sección SOLID
+InterfazUsuario.java
+BaseDatos.java
+OracleDataBase.java
+MySQLDatabase.java
+Cliente.java
 
+Explica los resultados.¿ El programa resuelve todos los posibles problemas del programa que no usa DIP.
+En resumen, en OOP, te sugiero seguir la cita de Robert C. Martin:
+Los módulos de alto nivel simplemente no deberían depender de los módulos de bajo nivel de ninguna manera.
+Entonces, cuando tienes una clase base y una clase derivada, tu clase base no debe conocer ninguna de sus clases derivadas.
+
+InterfazUsuario.java\
+En esta clase InterfazUsuario genera un atributo database de tipo BaseDatos y contiene al constructor InterfazUsuario y asu vez tambien contiene al metodo saveEmployeeID que guarda el ID del empleado en database.
+```java
+class InterfazUsuario {
+  private BaseDatos database;
+  public InterfazUsuario(BaseDatos database)
+  {
+      this.database=database;
+  }
+    public void saveEmployeeId(String empId) {
+        database.SaveEmpIdInDatabase(empId);
+    }
+}
+```
+BaseDatos.java\
+Esta interfaz BaseDatos contiene al metodo SaveEmpIdInDatabase que a su vez es usada tambien por las clases MySQLDatabase y OracleDatabase
+```java
+interface BaseDatos {
+  void SaveEmpIdInDatabase(String empId);
+}
+```
+OracleDataBase.java\
+En la clase OracleDatabase  esta implementando de la interfaz BaseDatos que es abstracta que contiene al metodo SaveEmpIdInDatabase que guarda el Id del empleado en la base de datos y lo muestra.
+```java
+class OracleDatabase implements BaseDatos {
+    public void SaveEmpIdInDatabase(String empId)
+ {
+     System.out.println("El id: " + empId + " es guardado en la base de datos Oracle.");
+
+ }
+}
+```
+MySQLDatabase.java \
+-Esta clase MySQLDatabase implementa de la interfaz BaseDatos abstracta que contiene al metodo SaveEmpIdInDatabase en lo cual imprime el ID del y lo guarda en la base datos MySQL
+```java
+class MySQLDatabase implements BaseDatos {
+    public void SaveEmpIdInDatabase(String empId)
+    {
+        System.out.println("El id: " + empId + " es guardado en MySQL de la base de datos.");
+    }
+}
+```
+Cliente.java\
+En esta clase Cliente tiene una main .Usando Oracle genera un objeto database del tipo de la clase OracleDatabase ,tambien genera un objeto llamado usuario de tipo InterfazUsuario a la vez esta usando como argumento el objeto de la linea anterior
+el objeto usuario usando al metodo saveEmployeeID guarda el ID del usuario.Crea al objeto Mysql usa al objeto database de la clase MySQLDatabase, luego crea al objeto usuario de tipo interfazusuario, y asi el objeto usuario usando el metodo saveEmployeeID guarda el ID del usuario.
+```java
+public class Cliente {
+    public static void main(String[] args) {
+        System.out.println("Demostracion con DIP");
+        // Usando Oracle
+        BaseDatos database = new OracleDatabase();
+        InterfazUsuario usuario = new InterfazUsuario(database);
+        usuario.saveEmployeeId("E001");//SaveEmployeeId("E001");
+        // Usando Mysql
+        database = new MySQLDatabase();
+        usuario = new InterfazUsuario(database);
+        usuario.saveEmployeeId("E002");
+    }
+}
+```
+Pregunta 35\
+Encuentra alguna excepción a esta sugerencia.
+
+Una de las excepciones sería considerar el caso en el que su clase base necesita restringir el recuento de instancias de clases derivadas en un punto determinado. Luego tambien se podria notar cuando el constructor de la clase InterfazUsuario acepta un parámetro database.Asi tambien puede proporcionar una instalación adicional al usuario cuando usa tanto el constructor como la propiedad dentro de esta clase.
+
+Pregunta 36\
+El constructor de la clase InterfazUsuario acepta un parámetro de base de datos.
+Proporciona una instalación adicional a un usuario cuando utiliza tanto el constructor como el
+método setter (setDatabase) dentro de esta clase. ¿Cuál es el beneficio?.
+
+El beneficio sería que ahora puede crear instancias de una base de datos mientras crea instancias de la clase InterfazUsuario y cambiarla más tarde usando BaseDatos. Un ejemplo sería agregar y asi probar
+```java
+BaseDatos.database = new OracleDatabase();
+usuario.saveEmployeeId("E003");
 ```
 
 `hola me llamo`
