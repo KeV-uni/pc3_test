@@ -557,7 +557,7 @@ Muestra la salida y explica los resultados en función de los métodos entregado
 ```java
 
 ```
-```javA
+```java
 
 ```
 ```java
@@ -569,6 +569,317 @@ Muestra la salida y explica los resultados en función de los métodos entregado
 Pregunta 19 \
 ¿Por qué un usuario necesita cambiar una clase base (o una interfaz)?
 
+Para implementar una nueva funcionalidad en algún futuro tomando como referencia el ejemplo anterior nosotros queremos mostrar qué tipo de fax se está enviando, ya sea LanFax,EFax o AnalogFax.Esto nos genera un problema ya que previamente el método sendFax no usaba ningún parámetro como referencia, pero como ahora necesitamos mostrar que tipo de fax está mandando este método, por lo que ahora necesita recibir un parámetro.Pero esto genera un problema ya que necesitamos hacer cambios en la interfaz impresora, consecuentemente a esto tambien tendriamos que hacer cambios en la clase impresoraBasica ,que implementa la clase Impresora, para adaptarse a las modificaciones.En conclusión tendríamos que hacer varios cambios al programa y esto no es lo adecuado por lo que el Principio de Segregación de la Interfaz (ISP) se ocupara de estos problemas.\
+Mostrando la jerarquía de fax con las distintas variaciones de sus metodos:
+```java
+interface Fax {
+    void faxType();
+}
+
+class LanFax implements Fax{
+    @Override
+    public void faxType(){
+        System.out.println("Enviamos el fax usando LanFax.");
+    }
+}
+class AnalogFax implements Fax{
+    @Override
+    public void faxType(){
+        System.out.println("Enviando el fax mediante AnalogFax.");
+    }
+}
+class InternetFax implements Fax{
+    @Override
+    public void faxType(){
+        System.out.println("Enviando el fax mediante InnternetFax(EFax).");
+    }
+}
+```
+Pregunta 20\
+Para usar esta jerarquía de herencia, una vez que modificas el método sendFax() a
+sendFax(Fax faxType) en la clase ImpresoraAvanzada, exige que cambies la interfaz de Impresora (sí, aquí también rompe el OCP).
+Cuando actualices Impresora, también debes actualizar la clase impresoraBasica para adaptarse a este cambio. ¡Ahora ves el problema!. Explica el problema.
+
+Aquí notamos que cuando hay un cambio en ImpresoraAvanzada provoca cambios en la interfaz Impresora, lo que a su vez hace que la impresoraBasica actualice su método fax. Aunque impresoraBasica no necesita este método de fax para nada, un cambio del método fax en otro cliente de Impresora obliga a impresoraBasica a que tenga un cambio y se vuelva a recompilar.
+
+Pregunta 21\
+Si has entendido correctamente el problema. El ISP te sugiere que te ocupes de este tipo de escenario. Explica tu respuesta.
+
+El problema radica, cuando veamos una interfaz llena, tenemos que preguntarnos si esos métodos de interfaz son necesarios para cada cliente.Sino, tendríamos un problema ya que si es que se requiere un cambio en alguna de las clases que implementa la interfaz, este cambio afectaría no solo a la interfaz sino que afectaría a las demás clases que implementan la misma interfaz. Lo mismo ocurriría si se quisiera agregar otra impresora por ejemplo que pueda fotocopiar, se tendrían que hacer cambios en la interfaces y también a las demás clases. Por lo tanto, la solución que se tendría sería dividir en interfaces más pequeñas que sean relevantes para los clientes específicos.
+```java
+interface Impresora {
+    void printDocument();
+
+    void sendFax();
+}
+```
+Pregunta 22\
+¿Es conveniente usar e inicializar el siguiente código?
+interface Impresora {
+void printDocument();
+void sendFax();
+}
+
+No ya que en esta interfaz sólo está considerando los métodos printDocument() y sendFax() para impresoras avanzadas que puedan imprimir y enviar fax. Pero  en el caso donde se requiera llamar a una impresora básica que contiene sólo al método  printDocument() estaría usando métodos que no debería tener la impresora básica que sería sendFax().Por lo tanto no sería muy conveniente usar este código para buenas prácticas.
+
+Pregunta 23 \
+Si comienzas tu codificación considerando las impresoras avanzadas que pueden imprimir y enviar un fax, está bien. Pero en una etapa posterior, si tu programa también necesita admitir impresoras básicas,¿ qué código puedes escribir?.
+
+Como antes el código violaba el principio de OCP, en lo que respecta a la interfaz Impresora ya que no estaba cerrada para su modificación, ya que si se necesitaba hacer alguna modificación en alguna de las clases que implementa, la interfaz Impresora tenia que cambiar, y por consecuencia también sus otras clases que la implementan, violando tambien asi el LSP. Para solucionar este problema haremos uso del Principio de Segregación de la Interfaz (ISP),para esto primero separamos la interfaz Impresora de noSolid en : la interfaz Impresora que contiene únicamente el método printDocument() que nos muestra que imprime un documento  y la otra interfaz sería DispositivoFax que contiene el método sendFax() que nos muestra que envía un fax. Esto se hace con el fin de que cada nueva impresora que se quiera añadir al programa, tenga que crear únicamente una clase implementando las interfaces que sean necesarias para así obtener los métodos que necesita esta clase. Por ejemplo la clase ImpresoraBasica() que únicamente requiere del método printDocument() solo tendrá que implementar la interface Impresora, en cambio la clase ImpresoraAvanzada() utiliza los métodos printDocument() y sendFax(), por lo que tendrá que implementar la interface Impresora e DispositivoFax.
+
+Pregunta 24 \
+Comprueba tus respuestas añadiendo dentro de main(), el siguiente código
+polimórfico:\
+Impresora impresora = new ImpresoraAvanzada();\
+impresora.printDocument();\
+impresora.sendFax();\
+impresora = new ImpresoraBasica();\
+impresora.printDocument();\
+impresora .sendFax();
+
+En la clase Cliente que contiene al método main nos muestra la creación del objeto impresora de la clase ImpresoraAvanzada que a su vez ésta implementa la interfaz Impresora.
+```java
+class Cliente {
+    public static void main(String[] args) {
+        System.out.println("Demostracion sin ISP");
+        Impresora impresora = new ImpresoraAvanzada();
+        impresora.printDocument();
+        impresora.sendFax();
+        /*more code*/
+   }
+}
+```
+Por lo cual el objeto impresora de la clase ImpresoraAvanzada manda a llamar los métodos printDocument() y sendFax() de la interfaz Impresora.
+```java
+public class ImpresoraAvanzada implements Impresora{
+    @Override
+    public void printDocument() {
+        System.out.println("La impresora avanzada imprime un documento.");
+    }
+
+    @Override
+    public void sendFax() {
+        System.out.println("La impresora avanzada envía un fax.");
+    }
+}
+```
+Luego se crea el objeto impresora de la clase ImpresoraBasica que a su vez también implementa la interfaz Impresora.
+```java
+class Cliente {
+    public static void main(String[] args) {
+        /*more code*/
+        impresora = new ImpresoraBasica();
+        impresora.printDocument();
+        impresora.sendFax();
+   }
+}
+```
+Luego el objeto impresora de la clase ImpresoraBasica manda a llamar a los métodos printDocument() y sendFax() de la interfaz Impresora como se muestra.
+```java
+class ImpresoraBasica implements Impresora{
+    @Override
+    public void printDocument() {
+        System.out.println("La impresora basica imprime un documento.");
+    }
+    @Override
+    public void sendFax() {
+        throw new UnsupportedOperationException();
+    }
+}
+```
+Por lo cual éste último muestra un error en pantalla al intentar usar el método sendFax(), como se logra ver :
+```
+Demostracion sin ISP
+La impresora avanzada imprime un documento.
+La impresora avanzada envía un fax.
+La impresora basica imprime un documento.
+Exception in thread "main" java.lang.UnsupportedOperationException
+	at NoSolid.ISP.ImpresoraBasica.sendFax(ImpresoraBasica.java:11)
+	at NoSolid.ISP.Cliente.main(Cliente.java:17)
+```
+Además, no puedes escribir algo como
+```java
+List<Impresora> impresoras = new ArrayList<Impresora>();
+impresoras.add(new ImpresoraAvanzada());
+impresoras.add(new ImpresoraBasica());
+for (Impresora dispositivo : impresoras) {
+    dispositivo.printDocument();
+    dispositivo.sendFax();
+}
+```
+En ambos casos, verás excepciones de tiempo de ejecución.
+
+Lo que hace este código dentro del main de la clase Cliente, es que crea una lista de objetos de la interfaz Impresora.
+```java
+class Cliente {
+    public static void main(String[] args) {
+        System.out.println("Demostracion sin ISP\n");
+        
+        List<Impresora> impresoras = new ArrayList<Impresora>();
+        /*more code*/
+    }
+}
+```
+Nota: Esta interfaz esta definida como se muestra :
+```java
+interface Impresora {
+    void printDocument();
+
+    void sendFax();
+}
+```
+A esta lista que acabamos de crear la llamaremos impresoras, luego añade a esta lista nuevos objetos de la clase ImpresoraAvanzada que implementa la interface Impresora, también añade a la lista nuevos objetos de la clase ImpresoraBasica.
+```java
+class Cliente {
+    public static void main(String[] args) {
+        System.out.println("Demostracion sin ISP\n");
+
+        List<Impresora> impresoras = new ArrayList<Impresora>();
+        impresoras.add(new ImpresoraAvanzada());
+        impresoras.add(new ImpresoraBasica());
+    }
+}
+```
+Por último recorre mediante un for la lista impresoras creada anteriormente, y para cada objeto recorrido de la lista, llama a los métodos printDocument() y sendFax() cada una de su respectiva clase a la que pertenece el objeto recorrido. 
+```java
+class Cliente {
+    public static void main(String[] args) {
+        /*more code*/
+        for(Impresora dispositivo:impresoras){
+            dispositivo.printDocument();
+            dispositivo.sendFax();
+        }
+    }
+}
+```
+Y cómo se logra observar es la misma salida que el código explicado anteriormente, con el mismo error que se lanza cuando se llama al método senFax() de la clase ImpresoraBasica.
+```
+La impresora avanzada imprime un documento.
+La impresora avanzada envía un fax.
+La impresora basica imprime un documento.
+Exception in thread "main" java.lang.UnsupportedOperationException
+    at NoSolid.ISP.ImpresoraBasica.sendFax(ImpresoraBasica.java:11)
+    at NoSolid.ISP.Cliente.main(Cliente.java:23)
+```
+Pregunta 25 \
+Reemplaza el segmento de código\
+for (Impresora dispositivo : impresoras) { \
+    dispositivo.printDocument();\
+    dispositivo.sendFax();\
+}\
+con una expresión lambda adecuada. Tú eliges cuál quieres usar.
+
+En este caso la expresion lambda que decidi utilizar fue la siguiente:
+```java
+class Cliente {
+    public static void main(String[] args) {
+        System.out.println("Demostracion sin ISP\n");
+        /*more code*/
+        impresoras.forEach((dispositivo)->{dispositivo.printDocument();
+            dispositivo.sendFax();});
+        
+        /*for(Impresora dispositivo:impresoras){
+            dispositivo.printDocument();
+            dispositivo.sendFax();
+        }*/
+    }
+}
+```
+Como se puede ver, la expresion lambda recorre la lista impresoras, y trabaja con cada uno de los objetos que la conforman, llamando para cada objeto el metodo printDocument() y el metodo senFax().
+
+Pregunta 26\
+Muestra la salida y explica los resultados en función de los métodos entregados.
+
+Luego como se puede ver en la imagen de la salida, es igual que cuando recorriamos la lista mediante el for.
+Ya que el funcionamiento completo del codigo no cambia, unicamente cambia como es que imprimimos en pantalla
+cada metodo de cada objeto que conforma la lista.
+```
+La impresora avanzada imprime un documento.
+La impresora avanzada envía un fax.
+La impresora basica imprime un documento.
+Exception in thread "main" java.lang.UnsupportedOperationException
+    at NoSolid.ISP.ImpresoraBasica.sendFax(ImpresoraBasica.java:11)
+    at NoSolid.ISP.Cliente.lambda$main$0(Cliente.java:22)
+    at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+    at NoSolid.ISP.Cliente.main(Cliente.java:21)
+```
+
+Pregunta 27\
+Hay dos actividades diferentes: una es imprimir unos documentos y la otra es enviar un fax.
+Crea dos interfaces llamada Impresora y DispositivoFax. Impresora contiene el método
+printDocument() y DispositivoFax contiene el método SendFax(). No olvides explicar tus resultados.
+
+Como se observa, la interfaz Impresora que separamos anteriormente en 2 interfaces, una de ellas es la interfaz Impresora que únicamente posee el método printDocument().
+```java
+interface Impresora {
+    void printDocument();
+}
+```
+Luego tenemos a la interfaz DispositivoFax es la segunda interfaz creada, que únicamente posee el método sendFax().
+```java
+interface DispositivoFax {
+    void sendFax();
+}
+```
+Como se observa en la clase ImpresoraBasica que a su vez implementa la interfaz Impresora que únicamente contiene el método printDocument()
+```java
+public class ImpresoraBasica implements Impresora{
+    public void printDocument(){
+        System.out.println("Impresora basica imprime un documento.");
+    }
+}
+```
+Aquí podemos observar la clase ImpresoraAvanzada que implementa las interfaces Impresora y DispositivoFax. Esta clase tiene la tarea de definir los métodos printDocument() y sendFax() que se encontraban cada una dentro de la interfaz Impresora y DispositivoFax respectivamente.
+```java
+public class ImpresoraAvanzada implements Impresora, DispositivoFax{
+        public void printDocument(){
+            System.out.println("La impresora avanzada imprime un documento.");
+        }
+        public void sendFax(){
+            System.out.println("La impresora avanzada envia un fax.");
+        }
+}
+```
+Ahora en la clase Cliente que contiene al método main nos muestra la creación del objeto impresora de la clase ImpresoraBasica que a su vez ésta implementa la interfaz Impresora por lo cual el objeto impresora manda a llamar al método printDocument().Luego se crea el objeto impresora de la clase ImpresoraAvanzada que a su vez también se implementa de la interfaz Impresora que manda a llamar al método printDocument() de la interfaz Impresora.Así también se crea un objeto fax de la clase ImpresoraAvanzada que a su vez ésta implementa la interfaz DispositivoFax por lo cual el objeto fax manda a llamar al método sendFax() de la interfaz DispositivoFax.
+```java
+public class Cliente {
+    public static void main(String[] args) {
+        System.out.println("Demostracion con ISP");
+
+        Impresora impresora = new ImpresoraBasica();
+        impresora.printDocument();
+        impresora = new ImpresoraAvanzada();
+        impresora.printDocument();
+
+        DispositivoFax fax = new ImpresoraAvanzada();
+        fax.sendFax();
+    }
+}
+```
+Por último veremos lo que se muestra en la salida por pantalla, como se vio en la explicación del código anterior de la clase Cliente, se define un objeto impresora de la interface Impresora como un objeto de la clase ImpresoraBasica y se manda a llamar a su único método printDocument(). Luego se sobreescribe sobre el objeto impresora creado anteriormente como si fuese un objeto de la clase ImpresoraAvanzada , para luego mostrar su método printDocument(). Para terminar se define un objeto fax de la interface DispositivoFax como un objeto de la clase ImpresoraAvanzada y mandamos a llamar a su método sendFax().
+El resultado de todo esto se muestra en la pantalla :
+```
+Demostracion con ISP
+Impresora basica imprime un documento.
+La impresora avanzada imprime un documento.
+La impresora avanzada envia un fax.
+```
+Pregunta 28\
+¿Qué sucede si usa un método predeterminado dentro de la interfaz?.
+
+Si usamos un método predeterminado en la interfaz, entonces la clase que implementa la interfaz no tendría que molestarse por la funcionalidad de esta. Pero aquí ocurre un gran problema ya que si en la interfaz agregamos un método, este nuevo método debe de estar disponible para su uso, en las clases que implementan la interfaz, por lo que estas clases también tendrían que estar cambiando constantemente. Por lo tanto se estaría violando el principio OCP y el principio de sustitución de Liskov (LSP), provocando así que sea difícil la reutilización de código para posibles mejoras en el futuro.
+
+Pregunta 29\
+¿Qué sucede si proporcionas un método de fax predeterminado en una interfaz?.
+
+En el caso de que se agregue un nuevo método predeterminado sendFax() que está en la interfaz DispositivoFax que es usado por la clase ImpresoraBasica y esto violaría los principios de OCP y LSP por lo que a su vez también podría provocar problemas de mantenimiento y reutilizaciones difíciles. Por lo tanto la  clase ImpresoraBasica tendría que mandar una exception cuando se llame este método. La exception que se tendria que mostrar en el codigo seria algo como esto:
+```java
+public void sendFax() { throw new UnsupportedOperationException(); }
+```
+Pregunta 30\
+¿Qué sucede si usa un método vacío, en lugar de lanzar la excepción?
+
+Se puede considerar que el uso de métodos vacíos no sigue el principio de ISP  ,ya que estarían violando el principio de :   "las clases que implementen una interfaz o una clase abstracta no deberían estar obligadas a utilizar partes que no van a utilizar".   porque ese método vacío no tendría funcionalidad ya que cuando se lanza una excepción esto ayudaría a mejorar el código smell ,ya que esta excepción nos indicaría que algo estaría funcionando mal .
 ```java
 
 ```
@@ -578,6 +889,9 @@ Pregunta 19 \
 ```java
 
 ```
+
+
+
 ### Principio de Inversión de Dependencia (DIP)
 Pregunta 31 \
 Muestra la salida y explica los resultados en función de los métodos entregados
@@ -600,8 +914,12 @@ Muestra la salida y explica los resultados en función de los métodos entregado
 
 ```
 
-
-`$ npm install marked`
+`hola me llamo`
+`$ npm install ma
+ed`
+```
+ASDFASDMASMASDMASD
+```
 
 
 
