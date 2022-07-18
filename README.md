@@ -669,7 +669,7 @@ class MySQLDatabase implements BaseDatos {
     }
 }
 ```
-Pregunta 32 \
+Pregunta 34 \
 Completa todos los archivos siguientes de la sección SOLID
 InterfazUsuario.java
 BaseDatos.java
